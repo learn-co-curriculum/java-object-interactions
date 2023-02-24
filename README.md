@@ -470,6 +470,14 @@ means a message is being sent to the object.  The `toString()` messages
 are omitted from the message count in this example to simplify the sequence
 diagrams.
 
+## Conclusion 
+
+This was an example of a small program, but in the real world, when working
+with hundreds of different classes and objects that are all calling
+each others methods, a sequence diagram is a super helpful visualization.
+
+![sequence diagram all messages](https://curriculum-content.s3.amazonaws.com/6676/java-multipleclasses/sequence_all.png)
+
 ## Resources
 
 - [UML Sequence Diagram](https://www.visual-paradigm.com/guide/uml-unified-modeling-language/what-is-sequence-diagram/)     
