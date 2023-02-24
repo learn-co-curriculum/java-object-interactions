@@ -93,7 +93,7 @@ at the line of code `myHarley.rideThroughMud();`.
 
 Press the `debug` button to launch the debugger and stop at the breakpoint,
 then switch to the Java Visualizer view (the yellow arrow is added to show the
-current line of execution).  The `MotorCycle` object
+current line of execution).  The `Motorcycle` object
 stores references to `Tire` objects in the `frontTire` and `rearTire`
 instance variables.  Air pressure is initialized to a random
 value, so your values may differ. 
