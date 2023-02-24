@@ -2,7 +2,7 @@
 
 ## Learning Goals
 
-- Discuss message passing in object-oriented programming
+- Discuss message passing in object-oriented programming 
 - Introduce **UML Sequence Diagrams** for visualizing object interactions
 - Implement object interactions in Java
 
@@ -19,17 +19,21 @@ we implement message passing through method invocation.
 Fork and clone this lesson.  We will build an application
 that demonstrates interactions among associated objects:
 
-- a `Motorcycle` object is associated with two `Tire` objects
-- a `Car` object is associated with four `Tire` objects
+- A `Motorcycle` object is associated with two `Tire` objects
+- A `Car` object is associated with four `Tire` objects
+
+![vehicle class diagram](https://curriculum-content.s3.amazonaws.com/6676/java-multipleclasses/vehicle_class_diagram.png)
 
 - The `Main` class contains a `main` method that creates an instance of `Motorcycle`
   and implicitly calls the `toString` and explicitly calls the`rideThroughMud` methods on the object.
+  - We will evolve the `main` to call additional `Motorcycle` methods as we write them.
+    The `main` method will also instantiate a `Car` object and call its methods.
 - The `Motorcycle` class has fields for the `make` and `model`, along
   with  fields `frontTire` and `rearTire` that reference instances of the `Tire` class.
 - The `Car` class has fields for the `make` and `model`, along
   with an array named `tires` that stores references to 4 `Tire` objects.
 - The `Tire` class has instance variables `airPressure` and `clean`,
-  along with class constants `MIN_RECOMMENDED_PRESSURE` and `MIN_RECOMMENDED_PRESSURE`.
+  along with class constants `MIN_RECOMMENDED_PRESSURE` and `MAX_RECOMMENDED_PRESSURE`.
 
 ```java
 public class Main {
@@ -44,16 +48,22 @@ public class Main {
         
     }
 }
-
 ```
 
 ## Visualizing Object Relations and Interactions
 
 
 ```java
-public void rideThroughMud() {
-    frontTire.setClean(false);
-    rearTire.setClean(false);
+public class Motorcycle {
+    
+    ...
+
+    public void rideThroughMud() {
+        frontTire.setClean(false);
+        rearTire.setClean(false);
+    }
+    
+    ...
 }
 ```
 
@@ -79,12 +89,14 @@ at the line of code `myHarley.rideThroughMud();`.
 - Use 'Step Over' for the print statements.
 - Use 'Step Into' for the `Motorcycle` and `Tire` method calls.
 
+### Message #1 `myHarley.rideThroughMud()`
+
 Press the `debug` button to launch the debugger and stop at the breakpoint,
 then switch to the Java Visualizer view (the yellow arrow is added to show the
 current line of execution).  The `MotorCycle` object
 stores references to `Tire` objects in the `frontTire` and `rearTire`
 instance variables.  Air pressure is initialized to a random
-value, so your values may differ.
+value, so your values may differ. 
 
 ![step0](https://curriculum-content.s3.amazonaws.com/6676/java-multipleclasses/object_interactions_step0.png)
 
@@ -97,7 +109,10 @@ references the `Motorcycle` object.
 
 ![step1](https://curriculum-content.s3.amazonaws.com/6676/java-multipleclasses/object_interactions_step1.png)
 
-Press "Step Into" to execute the method call `frontTire.setClean(true);`.
+
+### Message #2 `frontTire.setClean(false)`
+
+Press "Step Into" to execute the method call `frontTire.setClean(false);`.
 
 The debugger stops at the first line of code in the `setClean()` method,
 which is in the `Tire` class.  We see a new frame on the
@@ -113,14 +128,24 @@ from the parameter named `clean`.
 
 ![step3](https://curriculum-content.s3.amazonaws.com/6676/java-multipleclasses/object_interactions_step3.png)
 
-Press "Step Into" to return
-to the `driveThroughMud` method, and then continue stepping
-through the code so the rear tire is also no longer clean.
+Press "Step Into" to return to the `driveThroughMud` method.
+We can see the  `setClean()` frame is removed from the call stack,
+and the next line to be executed is `rearTire.setClean(false)`.
 
-## Challenge
+![return to driveThroughMud](https://curriculum-content.s3.amazonaws.com/6676/java-multipleclasses/return_rideThroughMud.png)
 
-Edit the `Motorcycle` class to add a new method named `wash()` that
-results in both tires being clean.
+### Message #3 `rearTire.setClean(false)`
+
+Use "Step Into" to call `rearTire.setClean(false)`, and continue
+stepping through the code so the rear tire is also no longer clean.
+
+![call rearTire.setClean](https://curriculum-content.s3.amazonaws.com/6676/java-multipleclasses/object_interactions_step4.png)
+
+### Message #4 `myHarley.wash()`
+
+Edit the `Motorcycle` class to add a new method named `wash()`.
+The `wash()` method should send two additional messages to
+the tire objects as shown in the sequence diagram below:
 
 ![wash sequence](https://curriculum-content.s3.amazonaws.com/6676/java-multipleclasses/sequence_wash.png)
 
@@ -132,11 +157,11 @@ public static void main(String[] args) {
     System.out.println(myHarley);
 
     System.out.println("Ride through mud");
-    myHarley.rideThroughMud();
+    myHarley.rideThroughMud();      // Message #1
     System.out.println(myHarley);
 
     System.out.println("Wash");
-    myHarley.wash();
+    myHarley.wash();                // Message #4
     System.out.println(myHarley);
 
 }
@@ -152,8 +177,11 @@ Wash the motorcycle
 make='Harley Davidson', model='Sportster', frontTire={airPressure=27, clean=true}, rearTire={airPressure=31, clean=true}
 ```
 
+### Message #7 `myHarley.wheelieThroughMud()`
+
+Only the rear tire gets muddy when doing a wheelie on a motorcycle.
 Edit the `Motorcycle` class to add a new method named `wheelieThroughMud()` that
-results in just the rear tire getting dirty (i.e. not clean).
+results in just one message sent to the rear tire.
 
 ![wheelie sequence](https://curriculum-content.s3.amazonaws.com/6676/java-multipleclasses/sequence_wheelie.png)
 
@@ -165,16 +193,17 @@ public static void main(String[] args) {
     System.out.println(myHarley);
 
     System.out.println("Ride through mud");
-    myHarley.rideThroughMud();
+    myHarley.rideThroughMud();       // Message #1
     System.out.println(myHarley);
 
-    System.out.println("Wash the motorcycle");
-    myHarley.wash();
+    System.out.println("Wash");
+    myHarley.wash();                 // Message #4
     System.out.println(myHarley);
 
     System.out.println("Wheelie through mud");
-    myHarley.wheelieThroughMud();
+    myHarley.wheelieThroughMud();    // Message #7
     System.out.println(myHarley);
+
 }
 ```
 
@@ -190,6 +219,8 @@ make='Harley Davidson', model='Sportster', frontTire={airPressure=32, clean=true
 Wheelie through mud
 make='Harley Davidson', model='Sportster', frontTire={airPressure=32, clean=true}, rearTire={airPressure=25, clean=false}
 ```
+
+### Message #9 `myHonda.checkTires()`
 
 Notice the project also contains a `Car` class, which uses an array having 4 `Tire`
 objects:
@@ -226,7 +257,7 @@ public class Car {
 ```
 
 Edit the `Car` class to add a method named `checkTires()`. The method takes no parameters
-and does not return a value.  The method should use a loop to all the `checkAirPressure`
+and does not return a value.  The method should use a loop to call the `checkAirPressure`
 method for each `Tire` object in the array.
 
 ![car sequence diagram](https://curriculum-content.s3.amazonaws.com/6676/java-multipleclasses/sequence_car.png)
@@ -240,29 +271,30 @@ public static void main(String[] args) {
     System.out.println(myHarley);
 
     System.out.println("Ride through mud");
-    myHarley.rideThroughMud();
+    myHarley.rideThroughMud();       // Message #1
     System.out.println(myHarley);
 
     System.out.println("Wash");
-    myHarley.wash();
+    myHarley.wash();                 // Message #4
     System.out.println(myHarley);
 
     System.out.println("Wheelie through mud");
-    myHarley.wheelieThroughMud();
+    myHarley.wheelieThroughMud();    // Message #7
     System.out.println(myHarley);
-
-
+    
     Car myHonda = new Car("Honda", "Accord");
     System.out.println("Before checking the tires");
     System.out.println(myHonda);
-    myHonda.checkTires();
+    myHonda.checkTires();            // Message #9
     System.out.println("After checking the tires");
     System.out.println(myHonda);
+
 }
 ```
 
-All car tires are initially low (your values may differ), but
-after checking the tires they should all have the maximum air pressure:
+The air pressure of each car tire is initially low (your values may differ). But
+after calling `checkTires` on the car, which in turn calls `checkAirPressure()`
+for each tire, they should have the maximum air pressure:
 
 ```text
 make='Harley Davidson', model='Sportster', frontTire={airPressure=26, clean=true}, rearTire={airPressure=32, clean=true}
@@ -289,26 +321,26 @@ public class Main {
         System.out.println(myHarley);
 
         System.out.println("Ride through mud");
-        myHarley.rideThroughMud();
+        myHarley.rideThroughMud();       // Message #1
         System.out.println(myHarley);
 
         System.out.println("Wash");
-        myHarley.wash();
+        myHarley.wash();                 // Message #4
         System.out.println(myHarley);
 
         System.out.println("Wheelie through mud");
-        myHarley.wheelieThroughMud();
+        myHarley.wheelieThroughMud();    // Message #7
         System.out.println(myHarley);
 
 
         Car myHonda = new Car("Honda", "Accord");
         System.out.println("Before checking the tires");
         System.out.println(myHonda);
-        myHonda.checkTires();
+        myHonda.checkTires();            // Message #9
         System.out.println("After checking the tires");
         System.out.println(myHonda);
-
     }
+    
 }
 ```
 
@@ -317,42 +349,43 @@ import java.util.Random;
 
 public class Motorcycle {
 
-    private String make;
-    private String model;
-    private Tire frontTire, rearTire;
+  private String make;
+  private String model;
+  private Tire frontTire, rearTire;
 
-    public Motorcycle(String make, String model) {
-        this.make = make;
-        this.model = model;
+  public Motorcycle(String make, String model) {
+    this.make = make;
+    this.model = model;
 
-        //initialize random tire pressure, both tires  clean
-        Random random = new Random();
-        frontTire = new Tire(random.nextInt(24, 34), true);
-        rearTire = new Tire(random.nextInt(24, 34), true);
-    }
+    //initialize random tire pressure, both tires  clean
+    Random random = new Random();
+    frontTire = new Tire(random.nextInt(24, 34), true);
+    rearTire = new Tire(random.nextInt(24, 34), true);
+  }
 
-    public void rideThroughMud() {
-        frontTire.setClean(false);
-        rearTire.setClean(false);
-    }
+  public void rideThroughMud() {
+    frontTire.setClean(false);   // Message #2
+    rearTire.setClean(false);    // Message #3
+  }
 
-    public void wheelieThroughMud() {
-        rearTire.setClean(false);
-    }
+  public void wheelieThroughMud() {
+    rearTire.setClean(false);    // Message #8
+  }
 
-    public void wash() {
-        frontTire.setClean(true);
-        rearTire.setClean(true);
-    }
+  public void wash() {
+    frontTire.setClean(true);    // Message #5
+    rearTire.setClean(true);     // Message #6
+  }
 
-    @Override
-    public String toString() {
-        return "make='" + make + '\'' +
-                ", model='" + model + '\'' +
-                ", frontTire=" + frontTire +
-                ", rearTire=" + rearTire ;
-    }
+  @Override
+  public String toString() {
+    return "make='" + make + '\'' +
+            ", model='" + model + '\'' +
+            ", frontTire=" + frontTire +
+            ", rearTire=" + rearTire ;
+  }
 }
+
 ```
 
 
@@ -362,35 +395,37 @@ import java.util.Random;
 
 public class Car {
 
-    private String make;
-    private String model;
-    private Tire[] tires;
+  private String make;
+  private String model;
+  private Tire[] tires;
 
-    public Car(String make, String model) {
-        this.make = make;
-        this.model = model;
+  public Car(String make, String model) {
+    this.make = make;
+    this.model = model;
 
-        Random random = new Random();
-        tires = new Tire[4];
-        for (int i=0; i<tires.length; i++) {
-            // all have low air pressure
-            tires[i] = new Tire(random.nextInt(24,27), true);
-        }
+    Random random = new Random();
+    tires = new Tire[4];
+    for (int i=0; i<tires.length; i++) {
+      // all have low air pressure
+      tires[i] = new Tire(random.nextInt(24,27), true);
     }
+  }
 
-    public void checkTires() {
-        for (Tire tire: tires)
-            tire.checkAirPressure();
-    }
+  public void checkTires() {
+    // Message #10, 11, 12, 13
+    for (Tire tire: tires)
+      tire.checkAirPressure();
+  }
 
 
-    @Override
-    public String toString() {
-        return "make='" + make + '\'' +
-                ", model='" + model + '\'' +
-                ", tires=" + Arrays.toString(tires);
-    }
+  @Override
+  public String toString() {
+    return "make='" + make + '\'' +
+            ", model='" + model + '\'' +
+            ", tires=" + Arrays.toString(tires);
+  }
 }
+
 ```
 
 ```java
@@ -427,10 +462,15 @@ public class Tire {
                 '}';
     }
 }
-
 ```
+
+
+NOTE: Each print statement makes an implicit call to `toString()`, which
+means a message is being sent to the object.  The `toString()` messages
+are omitted from the message count in this example to simplify the sequence
+diagrams.
 
 ## Resources
 
-- [UML Sequence Diagram](https://www.visual-paradigm.com/guide/uml-unified-modeling-language/what-is-sequence-diagram/)
+- [UML Sequence Diagram](https://www.visual-paradigm.com/guide/uml-unified-modeling-language/what-is-sequence-diagram/)     
 - [Interaction Diagram Lesson](https://sites.cs.ucsb.edu/~mikec/cs48/project/InteractionLarman.pdf)
